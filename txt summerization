@@ -1,0 +1,54 @@
+import numpy as np
+import pandas as pd
+import difflib
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from string import punctuation
+from sklearn.feature_extraction.text import TfidfVectorizer
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+text = input("Enter the paragraph...")
+# Word tokenization
+word_token = word_tokenize(text)
+stop_words = set(stopwords.words('english'))
+punctuation_set = set(punctuation)
+word = []
+for words in word_token:
+if words.lower() not in stop_words:
+if words.lower() not in punctuation_set:
+word.append(words)
+# TF-IDF calculation
+vector = TfidfVectorizer()
+sentence_matrix = vector.fit_transform([" ".join(word)])
+# Calculate sentence scores
+from nltk.tokenize import sent_tokenize
+sent_token = sent_tokenize(text)
+sentence_score = {}
+for i, sent in enumerate(sent_token):
+score = 0
+for words in word_tokenize(sent):
+if words.lower() not in stop_words:
+if words.lower() not in punctuation_set:
+if words.lower() in vector.vocabulary_:
+score += sentence_matrix[0,
+vector.vocabulary_[words.lower()]]
+sentence_score[sent] = score
+# Sort the sentences by score
+sentence_indexes = {sentence: index for index, sentence in
+enumerate(sent_token)}
+sorted_sentences = sorted(sentence_score.items(), key=lambda x: x[1],
+reverse=True)
+sorted_indexes = {sentence: sentence_indexes[sentence] for sentence, _
+in sorted_sentences}
+# Print the top 30% of sentences
+sort_30_sent = {}
+for i, (sent, index) in enumerate(sorted_indexes.items()):
+if i < 3:
+sort_30_sent[index] = sent
+sorted_30_sentences = [(k, sort_30_sent[k]) for k in
+sorted(sort_30_sent)]
+joined_text = ' '.join([sentence[1] for sentence in
+sorted_30_sentences])
+for sentence in joined_text.split('. '):
+print(sentence + '.\n\n')
